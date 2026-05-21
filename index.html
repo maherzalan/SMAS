@@ -932,6 +932,14 @@
             </div>
 
             <div class="settings-card">
+                <h3>📴 العمل بدون إنترنت</h3>
+                <p style="font-size:12px;color:#666;margin:0 0 12px;">يُحمّل نسخة من هذه الصفحة كملف HTML واحد لفتحها لاحقاً دون اتصال. البيانات المحفوظة في المتصفح (LocalStorage) لا تنتقل تلقائياً للملف — صدّر نسخة احتياطية JSON واستوردها في النسخة المحمّلة عند الحاجة.</p>
+                <div class="form-buttons">
+                    <button type="button" id="saveOfflineBtn" class="btn-primary" style="background-color:#4CAF50;">💾 تحميل الصفحة للعمل بدون إنترنت (Offline)</button>
+                </div>
+            </div>
+
+            <div class="settings-card">
                 <h3>ℹ️ معلومات النظام</h3>
                 <p style="font-size:13px;"><strong>عدد المراكز:</strong> <span id="infoCentersCount">0</span></p>
                 <p style="font-size:13px;"><strong>طلاب المركز النشط:</strong> <span id="infoTotalStudents">0</span></p>
@@ -4781,6 +4789,27 @@
             }
         }
 
+        /** تحميل نسخة HTML من الصفحة للعمل دون إنترنت */
+        function downloadOfflinePage() {
+            saveAllData();
+            const htmlContent = document.documentElement.outerHTML;
+            const blob = new Blob([htmlContent], { type: 'text/html;charset=utf-8' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'SMAS_Offline.html';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+            alert(
+                'تم تحميل الملف SMAS_Offline.html.\n\n' +
+                'يمكنك فتحه لاحقاً بدون إنترنت.\n\n' +
+                'تنبيه: بيانات الطلاب المحفوظة في هذا المتصفح (LocalStorage) لا تنتقل تلقائياً للملف المحمّل.\n' +
+                'لنقل البيانات: صدّر «نسخة احتياطية» JSON هنا ثم استوردها بعد فتح الملف المحمّل.'
+            );
+        }
+
         // ==================== التهيئة الأولية ====================
         function init() {
             loadData();
@@ -4821,6 +4850,9 @@
             }
 
             setupStudentFormValidationListeners();
+
+            const offlineBtn = document.getElementById('saveOfflineBtn');
+            if (offlineBtn) offlineBtn.addEventListener('click', downloadOfflinePage);
 
             showTab(resolveInitialTab());
             
